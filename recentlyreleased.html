@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+
+    <title> Recently Released | Movie Database </title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+    <style>
+
+    .num-results {
+        font-weight: bold;
+    }
+    img {
+        width: 100px;
+        height:auto;
+    }
+    #bar {
+        font-weight: bold;
+    }
+    #movie-list .row{
+        border: 1px solid lightgray;
+        align-items: center;
+        padding-top: 4px;
+        padding-bottom: 4px;
+    }
+
+    @media(min-width: 768px) {
+
+    }   
+    @media(min-width: 992px) {
+
+    }
+    </style>
+</head>
+<body>
+    <ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="main.php">Home</a></li>
+		<li class="breadcrumb-item active">Recently Released</li>
+	</ol>
+    <div class="container">
+        <div class="row">
+            <h1 class="col-12 mt-4 text-center"> Recently Released Movies </h1>
+        </div>
+
+        <div class="row">
+
+            <div class="col-12 mt-4">
+                Showing <span id="num-results"> 0 </span> of  <span id="total-results"> 0</span> result(s).
+            </div>
+
+
+            <div id="bar" class="container mt-2">
+                <div class="row">
+                <div class="col col-md-3">Poster Image</div>
+                <div class="col col-md-3">Title</div>
+                <div class="col col-md-3">Release Date</div>
+                <div class="col col-md-3">Rating</div>
+              </div>
+            </div>
+            
+            <div id="movie-list" class="container mt-2">
+                
+                
+            </div>
+
+        </div> <!-- row -->
+
+
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <script src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+
+        window.onload = function() {
+			const point = "https://api.themoviedb.org/3/movie/now_playing?api_key=c6ff93de3337bce1ce5014fe24e702be&language=en-US&page=1"
+
+			$.ajax({
+				url: point,
+				dataType: 'json',
+				success: function(data) {
+					document.querySelector("#num-results").innerHTML = data.results.length
+                    document.querySelector("#total-results").innerHTML = data.total_results
+
+
+					document.querySelector('#movie-list').innerHTML = ''
+
+					for (result of data.results) {
+						createRow(result)
+					}
+
+				},
+				error: function(e) {
+					alert("AJAX error")
+					console.log(e)
+				}
+			})
+
+
+			return false;
+		}
+
+        document.querySelector("#search-form").onsubmit = () => {
+            const term = document.querySelector('#search-term').value.trim();
+
+            if(term.length === 0) {
+                document.querySelector("#search-error").innerHTML = "Please enter your search"
+            } else {
+                document.querySelector("#search-error").innerHTML = ""
+            }
+
+            const endpoint = "https://api.themoviedb.org/3/search/movie?api_key=c6ff93de3337bce1ce5014fe24e702be&language=en-US&query=" + term + "&page=1&include_adult=false"
+
+            $.ajax({
+                url: endpoint,
+                dataType: 'json',
+                success: function(data) {
+                    console.log(data)
+
+
+                    document.querySelector("#num-results").innerHTML = data.results.length
+                    document.querySelector("#total-results").innerHTML = data.total_results
+
+
+                    document.querySelector('#movie-list').innerHTML = ''
+
+                    for (result of data.results) {
+                        createRow(result)
+                    }
+
+                },
+                error: function(e) {
+                    alert("AJAX error")
+                    console.log(e)
+                }
+            })
+
+            return false;
+        }
+
+        function createRow(movie){
+            const movieRow = document.createElement("div")
+            const movieTitle = document.createElement("div")
+            const movieRating = document.createElement("div")
+            const movieDate = document.createElement("div")
+            const movieIMG = document.createElement("div")
+            const img = document.createElement("img")
+
+			movieTitle.innerHTML = movie.title; // todo: Fill Out Info
+			movieRating.innerHTML = movie.vote_average; // todo: Fill Out Info
+            movieDate.innerHTML = movie.release_date;
+            img.src = "https://image.tmdb.org/t/p/w500" + movie.poster_path; // todo: Fill Out Info
+            img.alt = movie.title + " Poster"
+
+            movieRow.classList.add("row")
+            movieIMG.classList.add("col", "col-md-3")
+            img.classList.add("imgPic")
+            movieTitle.classList.add("col", "col-md-3")
+            movieRating.classList.add("col", "col-md-3")
+            movieDate.classList.add("col", "col-md-3")
+
+            movieRow.appendChild(movieIMG)
+            movieIMG.appendChild(img)
+            movieRow.appendChild(movieTitle)
+            movieRow.appendChild(movieDate)
+            movieRow.appendChild(movieRating)
+
+            document.querySelector("#movie-list").appendChild(movieRow);
+		}
+
+    </script>
+</body>
+</html>
